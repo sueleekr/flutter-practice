@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:todo_with_redux/model/note.dart';
 import 'package:todo_with_redux/pages/notedetails.dart';
@@ -27,8 +29,7 @@ class NoteItem extends StatelessWidget {
 
         tagWidget.add(
           Container(
-            width: note.tags![maxTagIdx].length*10,
-
+            width: note.tags![maxTagIdx].length*9,
             decoration: BoxDecoration(
               border: Border.all(
                 width: 1,
@@ -46,7 +47,7 @@ class NoteItem extends StatelessWidget {
           )
         );
         maxTagIdx++;
-      } while (totTags <= maxTags && (maxTags <= note.tags!.length) && note.tags!.length> 0);
+      } while (totTags <= maxTags && (maxTagIdx < note.tags!.length));
 
       if(maxTagIdx < (note.tags!.length))
         tagWidget.add(
@@ -156,7 +157,7 @@ class NoteItem extends StatelessWidget {
                         Padding(
                           padding: EdgeInsets.only(top: 5)
                         ),
-                        Text(note.content,
+                        Text(note.content.substring(0,min(note.content.length, 80)),
                           style: TextStyle(
                             color: Colors.blueGrey,
                             fontWeight: FontWeight.bold,
