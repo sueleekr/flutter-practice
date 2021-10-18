@@ -20,9 +20,8 @@ class NoteEditAction extends BaseAction {
       throw Exception('This note doesn\'t have id');
     notes = List.of(state.noteState.notes) ;
 
-    //idx = notes.indexOf(note);
-    //notes[idx].title = notes[idx].title;
-
+    idx = notes.indexWhere((element) => element.id == note.id);
+    notes[idx] = note;
 
     NoteState itemState = NoteState( notes: notes, maxId: state.noteState.maxId);
     

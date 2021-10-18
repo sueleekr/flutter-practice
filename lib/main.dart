@@ -26,8 +26,8 @@ class MyApp extends StatelessWidget {
         //'/addnote': (context) => NoteDetails(),
         '/notedetails': (context) 
           {
-            final dynamic args = ModalRoute.of(context)!.settings.arguments;
-            return NoteDetails(note:args);
+            final NoteDetailsArguments args = ModalRoute.of(context)!.settings.arguments as NoteDetailsArguments;
+            return NoteDetails(note: args.note);
           }        
       },
     )

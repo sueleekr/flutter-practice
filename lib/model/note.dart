@@ -1,14 +1,14 @@
 class Note {
-  int id = 0;
+  int? id;
   String title = '';
   String content = '';
-  String tag = '';
+  List<String>? tags;
 
-  Note(String title, String content,{String tag = '', int id = 0}){
-    this.id = id;
-    this.title = title;
-    this.content = content;
-    this.tag = tag;
-  }
+  Note({
+    this.id,
+    this.title = '',
+    this.content = '',
+    this.tags
+  });
 
 }

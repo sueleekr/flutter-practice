@@ -1,11 +1,13 @@
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:todo_with_redux/model/note.dart';
 import 'package:todo_with_redux/redux/actions/noteaddaction.dart';
 import 'package:todo_with_redux/redux/actions/noteeditaction.dart';
 import 'package:todo_with_redux/redux/store.dart';
 
 class NoteDetails extends StatefulWidget {
-  final Note note;
+  final Note? note;
   
   NoteDetails({Key? key, required this.note}) : super(key: key);
 //NoteDetails({Key? key}) : super(key: key);
@@ -16,20 +18,34 @@ class NoteDetails extends StatefulWidget {
 class _NoteDetailsState extends State<NoteDetails> {
   TextEditingController titleController = TextEditingController();
   TextEditingController contentController = TextEditingController();
-  TextEditingController tagController = TextEditingController();
+  TextEditingController tagsController = TextEditingController();
+
+  List<String>? tags = <String>[];
 
   @override
+
+  void initState() {
+    if (widget.note !=null) {
+      super.initState();
+      tags = widget.note!.tags;
+    }
+  
+  }
+
   Widget build(BuildContext context) {
-    titleController.text = widget.note.title;
-    contentController.text = widget.note.content;
-    tagController.text = widget.note.tag;
+    titleController.text = widget.note?.title ?? '';
+    contentController.text = widget.note?.content ?? '';
+    //tagsController.text = (widget.note?.tags!.length == null ? '' : widget.note?.tags!.join(','))!;
+
     return Scaffold(
-      body: 
+      body: SingleChildScrollView(
+        child:
         Padding(
           padding: EdgeInsets.only(top: 50,left: 30, right: 30, bottom: 50),
           child: Center(
               child: Column(
-                 children: [
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                   TextField(
                     controller: titleController,
                     decoration: InputDecoration(
@@ -37,15 +53,14 @@ class _NoteDetailsState extends State<NoteDetails> {
                       border: OutlineInputBorder(),
                       labelText: 'Title',
                       labelStyle: TextStyle(color: Colors.blueAccent,
-                          fontStyle: FontStyle.italic, fontSize: 20, fontWeight: FontWeight.bold),
+                        fontStyle: FontStyle.italic, fontSize: 20, fontWeight: FontWeight.bold),
                       enabledBorder: UnderlineInputBorder(      
-                              borderSide: BorderSide(color: Colors.blue),   
-                              ),  
+                        borderSide: BorderSide(color: Colors.blue),   
+                      ),  
                       focusedBorder: UnderlineInputBorder(
                               borderSide: BorderSide(color: Colors.red),
                     ),  
                     ),
-                    onChanged: (val)=> widget.note.title = titleController.text ,
                   ),
                   Padding(padding: EdgeInsets.only(top: 20)),
                   TextField(
@@ -56,36 +71,128 @@ class _NoteDetailsState extends State<NoteDetails> {
                       border: OutlineInputBorder(),
                       labelText: 'Content'
                     ),
-                    onChanged: (val)=> widget.note.content = contentController.text ,
                   ),
                   Padding(padding: EdgeInsets.only(top: 20)),
+
+/*                   if(widget.note.tag!='')
+                  Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.start,
+                    children:[
+                        Container(
+                          alignment: Alignment.centerLeft,
+                          height: 20,
+                          width: widget.note.tag.length.toDouble()*8,
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color:Colors.blue
+                            ),
+                            borderRadius: BorderRadius.circular(10),
+                            color: Color(0xFFFFECB3)
+                          ),
+                          child: Center(
+                            child: Text(widget.note.tag.toUpperCase(),
+                            style: TextStyle(
+                              fontSize: 13
+                            ),
+                          )),
+                        ),
+                    ]
+                  ), */
+
                   TextField(
-                    controller: tagController,
+                    maxLength: 30,
+                    maxLengthEnforcement: MaxLengthEnforcement.enforced,
+                    controller: tagsController,
                     decoration: InputDecoration(
                       contentPadding: EdgeInsets.all(10),
                       border: OutlineInputBorder(),
-                      labelText: 'Tag'
+                      labelText: 'Tags'
                     ),
-                    onChanged: (val)=> widget.note.tag = tagController.text ,
+
+                    onSubmitted: (value) => onTagSubmit(value),
                   ),
+                  if(tags != null)
+                    Wrap(
+                      children: tags!.asMap().entries.map((tag){
+                        return
+                          InputChip(
+                            backgroundColor: Colors.lime,
+                            label: Text(tag.value),
+                            labelStyle: TextStyle(
+                              color: Colors.black 
+                            ),
+                            onDeleted: (){
+                              setState(() {
+                                tags!.removeAt(tag.key);
+                              });
+                              
+                            },
+                          ); 
+                      }).toList()
+                    ),
                   Padding(padding: EdgeInsets.only(top: 50)),
-                  ElevatedButton(
-                    onPressed: ()=>
-                      onSave(widget.note),
-                    child: Text('Save')
-                  ), 
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      OutlinedButton(
+                        onPressed: ()=>
+                          Navigator.pop(context),
+                        child: Text('Exit'),
+                        style: OutlinedButton.styleFrom(
+                          minimumSize: Size(100,35),
+                          side: BorderSide(color: Colors.grey,
+                            width: 1.0  
+                          )
+                        ),
+                      ), 
+                      Padding(padding: EdgeInsets.only(left: 10)),
+                      ElevatedButton(
+                        onPressed: ()=>
+                          onSave(),
+                        child: Text('Save'),
+                        style: ElevatedButton.styleFrom(
+                          onPrimary: Colors.black,
+                          onSurface: Colors.red,
+                          minimumSize: Size(100, 35)
+                        ),
+                      ), 
+                    ],
+                  )
                 ], 
               ) 
 
 
           ),
-        )
-      ,
-
+        ),
+      )
     );
+  
   }
 
-  void onSave(Note note) async {
+
+  onTagSubmit(String value) async {
+    List<String> newTags = value.split(',');
+
+     if (newTags.where((tag) => (tag.length >= 10)).length > 0) {
+      await alertMessage("Tag limit is 10");
+      return;
+    } 
+
+    if(newTags.length + tags!.length > 10) {
+      await alertMessage("You can attach tags upto 10");
+      return;
+    } 
+
+    setState(() {
+      List<String> values = value.split(',') ;
+      tags!.addAll(values);
+    });
+
+    tagsController.text = '';
+    //print(widget.note!.tags);   
+  }
+
+  void onSave() async {
 
     if(titleController.text == '' && contentController.text==''){
       bool result;
@@ -94,7 +201,9 @@ class _NoteDetailsState extends State<NoteDetails> {
       if (!result) return;
     }
 
-    if(note.id == 0) 
+    Note note = Note(title: titleController.text, content: contentController.text, tags: tags, id: widget.note?.id);
+
+    if(note.id ==null) 
       store.dispatch(NoteAddAction(note: note));
   
     else
@@ -146,3 +255,11 @@ class _NoteDetailsState extends State<NoteDetails> {
 
 
 }
+
+class NoteDetailsArguments {
+  Note? note;
+
+  NoteDetailsArguments({ this.note });
+}
+
+
