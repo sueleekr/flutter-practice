@@ -4,7 +4,6 @@ import 'package:todo_with_redux/pages/notedetails.dart';
 import 'package:todo_with_redux/redux/actions/notedeleteaction.dart';
 import 'package:todo_with_redux/redux/store.dart';
 import 'dart:math' as math;
-import 'package:collection/collection.dart';
 
 class NoteItem extends StatelessWidget {
     const NoteItem({Key? key, required this.note}) : super(key: key);
@@ -22,6 +21,8 @@ class NoteItem extends StatelessWidget {
       
       //Max display tag(length) == maxTags
       do { 
+        if (note.tags!.length == 0) break;
+      
         totTags += note.tags![maxTagIdx].length;
 
         tagWidget.add(
@@ -45,9 +46,9 @@ class NoteItem extends StatelessWidget {
           )
         );
         maxTagIdx++;
-      } while (totTags <= maxTags);
+      } while (totTags <= maxTags && (maxTags <= note.tags!.length) && note.tags!.length> 0);
 
-      if(maxTagIdx <= (note.tags!.length))
+      if(maxTagIdx < (note.tags!.length))
         tagWidget.add(
           Text((note.tags!.length - maxTagIdx).toString() + ' more')
         );
@@ -98,7 +99,7 @@ class NoteItem extends StatelessWidget {
                         Wrap(
                           direction: Axis.horizontal ,
                           children: 
-                            tagWidget.toList()
+                            tagWidget
 /*                             note.tags!.sublist(0,maxTagIdx).map((tag){
                               return 
                                 Container(
