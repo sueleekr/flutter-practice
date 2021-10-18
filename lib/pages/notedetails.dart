@@ -10,7 +10,7 @@ class NoteDetails extends StatefulWidget {
   final Note? note;
   
   NoteDetails({Key? key, required this.note}) : super(key: key);
-//NoteDetails({Key? key}) : super(key: key);
+
   @override
   _NoteDetailsState createState() => _NoteDetailsState();
 }
@@ -28,13 +28,14 @@ class _NoteDetailsState extends State<NoteDetails> {
     if (widget.note !=null) {
       super.initState();
       tags = widget.note!.tags;
+      titleController.text = widget.note!.title;
+      contentController.text = widget.note!.content;
     }
   
   }
 
   Widget build(BuildContext context) {
-    titleController.text = widget.note?.title ?? '';
-    contentController.text = widget.note?.content ?? '';
+
     //tagsController.text = (widget.note?.tags!.length == null ? '' : widget.note?.tags!.join(','))!;
 
     return Scaffold(
@@ -189,7 +190,6 @@ class _NoteDetailsState extends State<NoteDetails> {
     });
 
     tagsController.text = '';
-    //print(widget.note!.tags);   
   }
 
   void onSave() async {

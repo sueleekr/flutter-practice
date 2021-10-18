@@ -5,23 +5,53 @@ import 'package:todo_with_redux/redux/app_state.dart';
 import 'package:todo_with_redux/widgets/noteitme.dart';
 import 'notedetails.dart';
 
-class _AddListView extends StatefulWidget {
+class _Dashboard extends StatefulWidget {
 
   final List<Note> notes;
 
-  _AddListView({required this.notes});
+  _Dashboard({required this.notes});
     
   @override
-  __AddListViewState createState() => __AddListViewState();
+  _DashboardState createState() => _DashboardState();
 }
 
-class __AddListViewState extends State<_AddListView> {
-  TextEditingController titleController = TextEditingController();
-  TextEditingController contentController = TextEditingController();
-  TextEditingController testController = TextEditingController();
+class _DashboardState extends State<_Dashboard> {
+
+  TextEditingController searchItemControler = TextEditingController();
+
+  List<Note>? searchedNotes = <Note>[];
+
+  String searchItem = '';
+
+  void onSubmitSearch(value) {
+    setState(() {
+      searchItem = value;
+    });
+  }
 
   @override
+
   Widget build(BuildContext context) {
+    
+    searchedNotes = 
+      widget.notes.where((note) {
+        bool retVal =false;
+        String uppserSearchItem = searchItem.toUpperCase();
+
+          if (uppserSearchItem == '') return true;
+
+          if (note.title.toUpperCase().contains(uppserSearchItem)||note.content.toUpperCase().contains(uppserSearchItem)) {
+            retVal = true;
+          }
+
+          if(note.tags!.where((tag) => tag.toUpperCase().contains(uppserSearchItem)).length > 0) {
+            retVal = true;
+          }
+
+          return retVal;
+        }
+      ).toList();
+
     return 
     Scaffold(
       appBar: 
@@ -62,14 +92,35 @@ class __AddListViewState extends State<_AddListView> {
             child: 
               Column(
                 children: [
+                  TextField(
+                    controller: searchItemControler,
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.all(10),
+                      border: OutlineInputBorder(),
+                      labelText: 'Search',
+                      labelStyle: TextStyle(color: Colors.blueAccent,
+                        fontSize: 15, 
+                        fontWeight: FontWeight.bold
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Colors.lightGreen
+                        )
+                      ),
+                      focusedBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Colors.red),
+                      ),  
+                    ),
+                    onSubmitted: (value) => onSubmitSearch(value),
+                  ),
                   Padding(padding: EdgeInsets.only(top: 30)),
                   Expanded(
                     child: 
                       ListView.builder(
-                        itemCount: widget.notes.length,
+                        itemCount: searchedNotes!.length,
                         itemBuilder: (context, idx){
                           return 
-                            NoteItem(note: widget.notes[idx]);
+                            NoteItem(note: searchedNotes![idx]);
 /*                             Card(
                               child: ListTile(
                                 onTap: (){
@@ -153,32 +204,32 @@ class __AddListViewState extends State<_AddListView> {
   }
 }
 
-class AddListViewModel extends Redux.BaseModel<AppState>{
+class DashboardModel extends Redux.BaseModel<AppState>{
   List<Note> notes=<Note>[];
 
-  AddListViewModel();
+  DashboardModel();
 
-  AddListViewModel.build({
+  DashboardModel.build({
     required this.notes,
   }) : super(equals:[notes]);
 
   @override
   Redux.BaseModel fromStore() {
-    return AddListViewModel.build(
+    return DashboardModel.build(
       notes: state.noteState.notes
     );
   }
 }
 
-class AddListView extends StatelessWidget {
+class Dashboard extends StatelessWidget {
 
-  const AddListView({Key? key}) : super(key: key);
+  const Dashboard({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Redux.StoreConnector<AppState, AddListViewModel>(
-      model: AddListViewModel(),
-      builder: (BuildContext context, AddListViewModel vm) => _AddListView(
+    return Redux.StoreConnector<AppState, DashboardModel>(
+      model: DashboardModel(),
+      builder: (BuildContext context, DashboardModel vm) => _Dashboard(
         notes: vm.notes,
       ),
     );

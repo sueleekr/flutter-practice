@@ -1,6 +1,6 @@
 import 'package:async_redux/async_redux.dart';
 import 'package:flutter/material.dart';
-import 'package:todo_with_redux/pages/addlistview.dart';
+import 'package:todo_with_redux/pages/dashboard.dart';
 import 'package:todo_with_redux/pages/notedetails.dart';
 import 'package:todo_with_redux/redux/app_state.dart';
 import 'package:todo_with_redux/redux/store.dart';
@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/notelist',
       routes: {
-        '/notelist': (content) => AddListView(),
+        '/notelist': (content) => Dashboard(),
         //'/addnote': (context) => NoteDetails(),
         '/notedetails': (context) 
           {
