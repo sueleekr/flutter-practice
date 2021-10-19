@@ -15,18 +15,20 @@ class _AnimationBoardState extends State<AnimationBoard> with SingleTickerProvid
   double _color = 0.0;
   double _size = 0.1;
   bool _animateEnable = false;
-  double _currentPosition = 0;
+
   Color _circleColor = Color.fromRGBO(255, 0, 0, 1);
 
   late final _animationController = AnimationController(
     vsync: this,
-    duration: Duration(seconds: 1)
+    duration: Duration(microseconds: ((1-_speed)*100).toInt() == 0 ? 1000 :10000*((1-_speed)*100).toInt())
+    //Duration(seconds: 1)
   );
   
   @override
   void initState() {
-    _animationController.repeat();
   
+    //_animationController.repeat();
+    
     super.initState();
   }
 
@@ -53,20 +55,26 @@ class _AnimationBoardState extends State<AnimationBoard> with SingleTickerProvid
                 ),
                 builder: (context,child) { 
                   return Transform.translate(
-                    offset: Offset(0,_animateEnable?400*(_animationController.value - 0.5).abs():_currentPosition),
+                    offset: Offset(0,400*(_animationController.value - 0.5).abs()),
                     child: child,
                   );
                 }
               )
               ),
               Text('Animated'),
+              
               Switch(
                 value: _animateEnable,
                 onChanged: (value) {
                   setState(() {
-                    _currentPosition = 400*(_animationController.value - 0.5).abs();
+
                     _animateEnable = value;
-                    print(_animateEnable);
+                    if (value) {
+                      _animationController.repeat();
+                    }
+                    else{
+                      _animationController.stop(canceled: false);
+                    }
                   });
                 },
 
@@ -81,13 +89,17 @@ class _AnimationBoardState extends State<AnimationBoard> with SingleTickerProvid
                 child:
                 Slider.adaptive(
                   value: _speed, 
-                  onChanged: (value) => setState(() {
-                    _speed = value;
-                    //_animationController.duration = Duration(seconds: 100);
-                      _animationController.reset();
+                  onChanged: (value) {
+                    setState(() {
+                      _speed = value;
+
                       _animationController.duration = Duration(microseconds: ((1-_speed)*100).toInt() == 0 ? 1000 :10000*((1-_speed)*100).toInt());
+                      
                       _animationController.repeat();
-                  })
+                    });
+
+                  }
+                  
                 )
               ),
               Row(
@@ -128,9 +140,6 @@ class _AnimationBoardState extends State<AnimationBoard> with SingleTickerProvid
     );
   }
 
-
-  final random = Random();
-
 }
 
 
@@ -144,7 +153,7 @@ class OpenPainter extends CustomPainter {
     var paint1 = Paint()
       ..color = circleColor
       ..style = PaintingStyle.fill;
-    //a circle
+
     canvas.drawCircle(Offset(0, 100), this.circleSize, paint1);
   }
 
