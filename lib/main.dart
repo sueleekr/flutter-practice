@@ -1,6 +1,7 @@
 import 'package:async_redux/async_redux.dart';
 import 'package:flutter/material.dart';
 import 'package:todo_with_redux/pages/dashboard.dart';
+import 'package:todo_with_redux/pages/mainboard.dart';
 import 'package:todo_with_redux/pages/notedetails.dart';
 import 'package:todo_with_redux/redux/app_state.dart';
 import 'package:todo_with_redux/redux/store.dart';
@@ -20,8 +21,9 @@ class MyApp extends StatelessWidget {
         primaryColor: Colors.green,
         primarySwatch: Colors.lightGreen,
       ),
-      initialRoute: '/notelist',
+      initialRoute: '/',
       routes: {
+        '/':(content) => MainBoard(),
         '/notelist': (content) => Dashboard(),
         //'/addnote': (context) => NoteDetails(),
         '/notedetails': (context) 

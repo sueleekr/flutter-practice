@@ -54,8 +54,9 @@ class _DashboardState extends State<_Dashboard> {
 
     return 
     Scaffold(
-      appBar: 
+/*       appBar: 
         AppBar(
+          backgroundColor: Colors.white,
           title:Text('My Notes'),
           actions: [
             Padding(
@@ -69,51 +70,54 @@ class _DashboardState extends State<_Dashboard> {
                 },
                 child: Icon(
                   Icons.add,
-                  color: Colors.yellowAccent,
+                  color: Colors.blue,
                   size: 40.0,
                 ),
               )
             ),
           ],
-        ),
+        ), */
         
-/*         floatingActionButton:FloatingActionButton(
+        floatingActionButton:FloatingActionButton(
           child: Icon(Icons.add),
           onPressed: () => {
             Navigator.pushNamed(context, 
               '/notedetails', 
-              arguments: Note('',''),
-            ) 
+              arguments: NoteDetailsArguments()
+            )
           } 
-        ), */
+        ),
 
       body:
         Center(
             child: 
               Column(
                 children: [
-                  TextField(
-                    controller: searchItemControler,
-                    decoration: InputDecoration(
-                      contentPadding: EdgeInsets.all(10),
-                      border: OutlineInputBorder(),
-                      labelText: 'Search',
-                      labelStyle: TextStyle(color: Colors.blueAccent,
-                        fontSize: 15, 
-                        fontWeight: FontWeight.bold
+                  Padding(padding: EdgeInsets.all(10),
+                    child:
+                      TextField(
+                        controller: searchItemControler,
+                        decoration: InputDecoration(
+                          contentPadding: EdgeInsets.all(10),
+                          border: OutlineInputBorder(),
+                          labelText: 'Search',
+                          labelStyle: TextStyle(color: Colors.blueAccent,
+                            fontSize: 15, 
+                            fontWeight: FontWeight.bold
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.lightGreen
+                            )
+                          ),
+                          focusedBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.red),
+                          ),  
+                        ),
+                        onSubmitted: (value) => onSubmitSearch(value),
                       ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Colors.lightGreen
-                        )
-                      ),
-                      focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.red),
-                      ),  
-                    ),
-                    onSubmitted: (value) => onSubmitSearch(value),
                   ),
-                  Padding(padding: EdgeInsets.only(top: 30)),
+                  Padding(padding: EdgeInsets.only(top: 10)),
                   Expanded(
                     child: 
                       ListView.builder(
